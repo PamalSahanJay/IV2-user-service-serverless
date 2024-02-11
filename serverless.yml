@@ -1,0 +1,22 @@
+service: iv2-user-service-serverless
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+
+functions:
+  signup:
+    handler: src/handler.signup
+    events:
+      - httpApi:
+          path: /signup
+          method: get
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+  - serverless-dotenv-plugin
