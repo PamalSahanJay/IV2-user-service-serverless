@@ -16,6 +16,59 @@ functions:
           path: /signup
           method: get
 
+  login:
+    handler: src/handler.login
+    events:
+      - httpApi:
+          path: /login
+          method: post
+
+  verify:
+    handler: src/handler.verify
+    events:
+      - httpApi:
+          path: /verify
+          method: post
+
+  profile:
+    handler: src/handler.profile
+    events:
+      - httpApi:
+          path: /profile
+          method: post
+      - httpApi:
+          path: /profile
+          method: put
+      - httpApi:
+          path: /profile
+          method: get
+
+  cart:
+    handler: src/handler.cart
+    events:
+      - httpApi:
+          path: /cart
+          method: post
+      - httpApi:
+          path: /cart
+          method: put
+      - httpApi:
+          path: /cart
+          method: get
+
+  payment:
+    handler: src/handler.payment
+    events:
+      - httpApi:
+          path: /payment
+          method: post
+      - httpApi:
+          path: /payment
+          method: put
+      - httpApi:
+          path: /payment
+          method: get
+
 plugins:
   - serverless-offline
   - serverless-plugin-typescript
