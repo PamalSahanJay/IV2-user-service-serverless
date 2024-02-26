@@ -1,6 +1,13 @@
 import { APIGatewayProxyEventV2 } from "aws-lambda";
+import { UserRepository } from "../repository/userRepository";
+import { autoInjectable } from "tsyringe";
 
+@autoInjectable()
 export class UserService {
+    repository: UserRepository
+    constructor(repository: UserRepository) {
+        this.repository = repository
+    }
 
     async VerifyUser(event: APIGatewayProxyEventV2) {
         throw new Error("Method not implemented.");
@@ -12,6 +19,11 @@ export class UserService {
 
     async CreateUser(event: APIGatewayProxyEventV2) {
         // throw new Error("Method not implemented.");
+        const body = event.body
+        console.log(body)
+        const res = await this.repository.CreateUserOperation(body);
+        console.log('-----db')
+        console.log(res)
         return "this is create user"
     }
 
@@ -56,9 +68,4 @@ export class UserService {
     async UpdatePaymentMethod(event: APIGatewayProxyEventV2) {
         throw new Error("Method not implemented.");
     }
-
-    constructor() {
-
-    }
-
 }

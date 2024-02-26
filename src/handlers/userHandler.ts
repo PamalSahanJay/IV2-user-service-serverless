@@ -1,19 +1,36 @@
 import { APIGatewayProxyEventV2 } from "aws-lambda";
+import {container} from 'tsyringe'
 const dotenv = require('dotenv');
 import { SuccessResponse, ErrorResponse } from '../utility/response'
 import { UserService } from '../service/userService'
+import middy from "@middy/core";
+import jsonBodyParser from "@middy/http-json-body-parser";
 
-const userService = new UserService();
+const userService = container.resolve(UserService); // dependancy injection
 
-export const signup = async (event: APIGatewayProxyEventV2) => {
+export const signup = middy(async (event: APIGatewayProxyEventV2) => {
     console.log(event);
     try {
         const response = await userService.CreateUser(event);
+        console.log("-------res")
+        console.log(response)
         return SuccessResponse(response)
     } catch (error) {
         return ErrorResponse(error.message)
     }
-}
+}).use(jsonBodyParser())
+
+// export const signup = async (event: APIGatewayProxyEventV2) => {
+//     console.log(event);
+//     try {
+//         const response = await userService.CreateUser(event);
+//         return SuccessResponse(response)
+//     } catch (error) {
+//         return ErrorResponse(error.message)
+//     }
+// }
+
+// export const signup = middy().use(jsonBodyParser()).handler(signuph)
 
 export const login = async (event: APIGatewayProxyEventV2) => {
     console.log(event);
