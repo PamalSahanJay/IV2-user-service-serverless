@@ -11,4 +11,7 @@ package-lock.json
 .vscode
 
 # properties file
-.env*
+.env.dev
+.env.prod
+.env.perf
+.env.qa
