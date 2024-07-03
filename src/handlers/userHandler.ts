@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2 } from "aws-lambda";
-import {container} from 'tsyringe'
+import { container } from 'tsyringe'
 const dotenv = require('dotenv');
 import { SuccessResponse, ErrorResponse } from '../utility/response'
 import { UserService } from '../service/userService'
@@ -41,13 +41,16 @@ export const login = middy(async (event: APIGatewayProxyEventV2) => {
 }).use(jsonBodyParser())
 
 export const verify = async (event: APIGatewayProxyEventV2) => {
-    const handlerFunctions = {
-        'get': userService.GetVerificationToken,
-        'put': userService.EditProfile,
-        'post': userService.CreateProfile
-    };
-
-    return getSuitableMethod(event, handlerFunctions);
+    try {
+        const httpMethod = event.requestContext.http.method.toLowerCase();
+        if (httpMethod === "post") {
+            return userService.CreateProfile(event)
+        } else if (httpMethod === "get") {
+            return userService.GetVerificationToken(event);
+        }
+    } catch (error) {
+        return ErrorResponse(error.message);
+    }
 }
 
 export const profile = async (event: APIGatewayProxyEventV2) => {

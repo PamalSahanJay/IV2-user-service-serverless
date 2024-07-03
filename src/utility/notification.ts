@@ -4,8 +4,10 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 
-export const generateAccessToken = () => {
+export const generateAccessToken = async () => {
+    // console.log("generateAccessToken---")
     const code = Math.floor(10000 + Math.random() * 90000); // 5 digit code
+    // console.log("code--", code)
     let expiration = new Date();
     expiration.setSeconds(expiration.getSeconds() + 300);
     return { code, expiration };

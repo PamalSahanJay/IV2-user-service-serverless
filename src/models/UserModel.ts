@@ -4,5 +4,7 @@ export interface UserModel {
     password: string,
     salt: string,
     phone: string,
-    userType: "BUYER" | "SELLER"
+    userType: "BUYER" | "SELLER",
+    firstName: string,
+    lastName: string
 }

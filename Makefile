@@ -4,7 +4,13 @@ start_db:
 stop_db:
 	docker-compose down
 
-server:
-	npm run dev
+migrate_up:
+	npx db-migrate up
 
-.PHONY: start_db stop_db server
+migrate_down:
+	npx db-migrate down
+
+server:
+	npx npm run dev
+
+.PHONY: start_db stop_db server migrate migrate-down

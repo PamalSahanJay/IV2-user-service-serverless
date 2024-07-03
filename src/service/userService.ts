@@ -61,7 +61,9 @@ export class UserService {
                 password: hashedPassword,
                 phone: input.phone,
                 userType: "BUYER",
-                salt: salt
+                salt: salt,
+                firstName: input.firstName,
+                lastName: input.lastName
             });
             return data;
         } catch (error) {
@@ -71,24 +73,19 @@ export class UserService {
     }
 
     async GetVerificationToken(event: APIGatewayProxyEventV2) {
-
         try {
             const token = event.headers.authorization;
             const payload = await verifyToken(token);
             if (!payload) {
                 throw new Error("Invalid Token");
             }
-
-            const { code, expiration } = generateAccessToken()
-            // save on db to confirm verification
-            const response = await sendVeirficationCode(payload.phone, code);
-            if (response) {
-                return "Verification code sent successfully"
-            }
+            const { code, expiration } = await generateAccessToken()
+            await this.repository.updateVerificationCode(payload.email, code, expiration);
+            return "Verification code sent successfully";
         } catch (error) {
+            console.log("error", error.message)
             throw new Error(error.message);
         }
-
     }
 
     //profile section
