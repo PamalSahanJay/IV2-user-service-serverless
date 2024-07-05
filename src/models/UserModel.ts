@@ -7,4 +7,6 @@ export interface UserModel {
     userType: "BUYER" | "SELLER",
     firstName: string,
     lastName: string
+    verificationCode?: number,
+    expiry?: Date
 }

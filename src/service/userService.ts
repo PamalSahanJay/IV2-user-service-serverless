@@ -7,6 +7,8 @@ import { AppValidationError } from "../utility/errors";
 import { getHashedPassword, getSalt, validatePassword, generateToken, verifyToken } from "../utility/password";
 import { LoginInput } from "../models/dto/Logininput";
 import { generateAccessToken, sendVeirficationCode } from "../utility/notification";
+import { VerificationInput } from "../models/dto/VerificationInput";
+import { TimeDifference } from "../utility/dataHelper";
 
 @autoInjectable()
 export class UserService {
@@ -16,7 +18,32 @@ export class UserService {
     }
 
     async VerifyUser(event: APIGatewayProxyEventV2) {
-        throw new Error("Method not implemented.");
+        try {
+            const token = event.headers.authorization;
+            const payload = await verifyToken(token);
+            if (!payload) {
+                throw new Error("Invalid Token");
+            }
+            const input = plainToClass(VerificationInput, event.body);
+            const error = await AppValidationError(input)
+            if (error) {
+                throw new Error(error[0].constraints[Object.keys(error[0].constraints)[0]]);
+            }
+            const { verificationCode, expiry } = await this.repository.findAccount(payload.email);
+            if (verificationCode == parseInt(input.code)) {
+                const currentTime = new Date();
+                const diff = TimeDifference(expiry.toISOString(), currentTime.toISOString(), "m")
+                if (diff > 0) {
+                    await this.repository.updateVerifyUser(payload.email);
+                    return { "message": "Account verified successfully!" }
+
+                } else {
+                    throw new Error("Verification code expired! Please try again.");
+                }
+            }
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 
     async UserLogin(event: APIGatewayProxyEventV2) {
@@ -81,7 +108,7 @@ export class UserService {
             }
             const { code, expiration } = await generateAccessToken()
             await this.repository.updateVerificationCode(payload.email, code, expiration);
-            return "Verification code sent successfully";
+            return { "message": "Verification code sent successfully", "code": code };
         } catch (error) {
             console.log("error", error.message)
             throw new Error(error.message);

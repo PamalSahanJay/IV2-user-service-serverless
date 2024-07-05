@@ -10,7 +10,6 @@ export class BaseRepository {
       const client = await databaseClient();
       await client.connect();
       const result = await client.query(queryString, values);
-      console.log("db result ---", result)
       client.end();
       return result;
     } catch (error) {

@@ -2,7 +2,6 @@ import { Client } from 'pg'
 require('dotenv').config();
 
 export const databaseClient = () => {
-    console.log("user -------", process.env.USER_SERVICE_DB_USER)
     return new Client({
         user: process.env.USER_SERVICE_DB_USER,
         host: process.env.USER_SERVICE_DB_HOST,

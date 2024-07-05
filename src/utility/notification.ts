@@ -9,7 +9,8 @@ export const generateAccessToken = async () => {
     const code = Math.floor(10000 + Math.random() * 90000); // 5 digit code
     // console.log("code--", code)
     let expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + 300);
+    console.log("code expiration --", expiration)
+    expiration.setTime(new Date().getTime() + 30 * 60 * 1000);
     return { code, expiration };
 }
 
