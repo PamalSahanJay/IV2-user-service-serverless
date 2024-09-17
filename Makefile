@@ -10,6 +10,9 @@ migrate_up:
 migrate_down:
 	npx db-migrate down
 
+create_migration:
+	npx db-migrate create $(name) --sql-file
+
 server:
 	npx npm run dev
 
