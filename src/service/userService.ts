@@ -9,6 +9,7 @@ import { LoginInput } from "../models/dto/Logininput";
 import { generateAccessToken, sendVeirficationCode } from "../utility/notification";
 import { VerificationInput } from "../models/dto/VerificationInput";
 import { TimeDifference } from "../utility/dataHelper";
+import { ProfileInput } from "../models/dto/AddressInput";
 
 @autoInjectable()
 export class UserService {
@@ -19,16 +20,8 @@ export class UserService {
 
     async VerifyUser(event: APIGatewayProxyEventV2) {
         try {
-            const token = event.headers.authorization;
-            const payload = await verifyToken(token);
-            if (!payload) {
-                throw new Error("Invalid Token");
-            }
-            const input = plainToClass(VerificationInput, event.body);
-            const error = await AppValidationError(input)
-            if (error) {
-                throw new Error(error[0].constraints[Object.keys(error[0].constraints)[0]]);
-            }
+            const payload = await this.verifyAuthorizationToken(event);
+            const input = await this.validateEventInput(event, VerificationInput);
             const { verificationCode, expiry } = await this.repository.findAccount(payload.email);
             if (verificationCode == parseInt(input.code)) {
                 const currentTime = new Date();
@@ -87,7 +80,7 @@ export class UserService {
                 email: input.email,
                 password: hashedPassword,
                 phone: input.phone,
-                userType: "BUYER",
+                userType: "BUYER", // hard coded
                 salt: salt,
                 firstName: input.firstName,
                 lastName: input.lastName
@@ -118,6 +111,8 @@ export class UserService {
     //profile section
     async CreateProfile(event: APIGatewayProxyEventV2) {
         // throw new Error("Method not implemented.");
+        const payload = await this.verifyAuthorizationToken(event);
+        const input = plainToClass(ProfileInput, event.body);
         return "create profile";
     }
 
@@ -155,5 +150,23 @@ export class UserService {
 
     async UpdatePaymentMethod(event: APIGatewayProxyEventV2) {
         throw new Error("Method not implemented.");
+    }
+
+    private async verifyAuthorizationToken(event: APIGatewayProxyEventV2) {
+        const token = event.headers.authorization;
+        const payload = await verifyToken(token);
+        if (!payload) {
+            throw new Error("Invalid Token");
+        }
+        return payload;
+    }
+
+    private async validateEventInput(event: APIGatewayProxyEventV2, InputClass: any): Promise<any> {
+        const input = plainToClass(InputClass, event.body);
+        const error = await AppValidationError(input);
+        if (error) {
+            throw new Error(error[0].constraints[Object.keys(error[0].constraints)[0]]);
+        }
+        return input;
     }
 }
