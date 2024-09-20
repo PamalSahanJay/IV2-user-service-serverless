@@ -34,10 +34,10 @@ export const verify = middy(async (event: APIGatewayProxyEventV2) => {
         console.log("httpMethod", httpMethod)
         if (httpMethod === "post") {
             response = await userService.VerifyUser(event)
-            
+
         } else if (httpMethod === "get") {
             response = await userService.GetVerificationToken(event);
-           
+
         } else {
             return ErrorResponse("Request method is not supported");
         }
@@ -48,15 +48,25 @@ export const verify = middy(async (event: APIGatewayProxyEventV2) => {
     }
 }).use(jsonBodyParser())
 
-export const profile = async (event: APIGatewayProxyEventV2) => {
-    const handlerFunctions = {
-        'get': userService.GetProfile,
-        'put': userService.EditProfile,
-        'post': userService.CreateProfile
-    };
-
-    // return getSuitableMethod(event, handlerFunctions);
-}
+export const profile = middy(async (event: APIGatewayProxyEventV2) => {
+    try {
+        var response;
+        const httpMethod = event.requestContext.http.method.toLowerCase();
+        console.log("httpMethod", httpMethod)
+        if (httpMethod === "post") {
+            response = await userService.CreateProfile(event)
+        }
+        if (httpMethod === "get") {
+            response = await userService.GetProfile(event)
+        }
+        if(httpMethod === "put") {
+            response = await userService.EditProfile(event)
+        }
+        return SuccessResponse(response)
+    } catch (error) {
+        return ErrorResponse(error.message);
+    }
+}).use(jsonBodyParser())
 
 export const cart = async (event: APIGatewayProxyEventV2) => {
     const handlerFunctions = {

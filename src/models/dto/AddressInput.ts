@@ -1,6 +1,7 @@
 import { Length } from "class-validator"
 
 export class AddressInput {
+    id: string
     @Length(5, 50)
     address1: string
     address2: string

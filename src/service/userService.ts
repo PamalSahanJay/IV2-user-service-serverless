@@ -110,19 +110,33 @@ export class UserService {
 
     //profile section
     async CreateProfile(event: APIGatewayProxyEventV2) {
-        // throw new Error("Method not implemented.");
         const payload = await this.verifyAuthorizationToken(event);
+        console.log("Create profile ..")
         const input = plainToClass(ProfileInput, event.body);
-        return "create profile";
+        //DB trasaction 
+        const result = await this.repository.createProfile(payload.userId, input);
+        console.log("result", result)
+        return {
+            "message": "Profile created successfully",
+            "data": result
+        }
     }
 
     async GetProfile(event: APIGatewayProxyEventV2) {
-        // throw new Error("Method not implemented.");
-        return "get profile";
+        const token = event.headers.authorization;
+        const payload = await verifyToken(token);
+        if (!payload) {
+            throw new Error("Invalid Token");
+        }
+        const getUserProfile = await this.repository.getUserProfile(payload.userId)
+        return getUserProfile;
     }
 
     async EditProfile(event: APIGatewayProxyEventV2) {
-        // throw new Error("Method not implemented.");
+        const payload = await this.verifyAuthorizationToken(event);
+        console.log("Edit profile..")
+        const input = plainToClass(ProfileInput, event.body);
+        const result = await this.repository.updateProfile(payload.userId, input);
         return "edit profile"
     }
 

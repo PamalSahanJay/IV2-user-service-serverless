@@ -1,3 +1,5 @@
+import { AddressModel } from "./AddressModel"
+
 export interface UserModel {
     userId?: string,
     email: string,
@@ -9,4 +11,5 @@ export interface UserModel {
     lastName: string
     verificationCode?: number,
     expiry?: Date
+    address?: AddressModel[]
 }
